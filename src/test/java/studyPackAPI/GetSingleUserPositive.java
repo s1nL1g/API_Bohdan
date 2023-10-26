@@ -1,26 +1,29 @@
 package studyPackAPI;
 
-import io.restassured.response.Response;
+import io.qameta.allure.restassured.AllureRestAssured;
+import io.restassured.response.ValidatableResponse;
 import org.testng.annotations.Test;
-import studyPackAPI.pojoFiles.SingleUserInfoResponseDTO;
 
 import static io.restassured.RestAssured.given;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 public class GetSingleUserPositive {
 
     @Test
     public void get10thUserPositive() {
-        Response response = given()
-                .baseUri("https://reqres.in/")
-        .when()
-                .get("api/users/10");
+        ValidatableResponse response = given()
+                        .filter(new AllureRestAssured())
+                        .baseUri("https://reqres.in/")
+                .when()
+                        .get("api/users/10")
+                .then()
+                        .statusCode(200)
+                        .body("data.id", equalTo(10))
+                        .body("data.last_name", containsString("Fields"))
+                        .body("data.first_name", containsString("Byron"))
+                        .body("data.email", containsString("byron.fields@reqres.in"));
 
-        SingleUserInfoResponseDTO root = response.as(SingleUserInfoResponseDTO.class);
-
-        assertTrue(root.data.id == 10);
-        assertTrue(root.data.last_name.contains("Fields"));
-        assertTrue(root.data.first_name.contains("Byron"));
-        assertTrue(root.data.email.contains("byron.fields@reqres.in"));
     }
 }
+
